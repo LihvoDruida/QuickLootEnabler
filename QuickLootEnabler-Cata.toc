@@ -1,0 +1,8 @@
+## Interface: 40400
+## Title:<|cffff7d0aQuick|r> |cff69ccf0Loot Enabler|r
+## Notes: QuickLootEnabler automatically enables the auto-loot feature upon addon loading.
+## Version: v1
+## Author: melles1991
+## X-Curse-Project-ID:
+
+Core.lua
