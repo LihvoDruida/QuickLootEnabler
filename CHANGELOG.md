@@ -1,8 +1,4 @@
-#### release v2
+#### release v3
 
-- Implemented IsBagFull() function to check for free slots in bags
-- Ensures players can manage loot manually when bags are full
-- Added check for item presence using LootSlotHasItem(i)
-- Hid LootFrame instead of unregistering all events to prevent conflicts
-- Optimized usage of LOOT_DELAY to avoid duplicate looting
-- Cleaned up and improved code reliability
+- Update QuickLootEnabler to use modern Container API for bag and slot management (compatibility with latest WoW API)
+- Add compatibility for both modern and Cataclysm WoW versions by implementing dynamic API selection.
