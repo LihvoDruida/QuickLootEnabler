@@ -1,19 +1,38 @@
 local addonName, addonTable = ...
 
+local majorVersion = select(4, GetBuildInfo())
+
 local epoch = 0
 local LOOT_DELAY = 0.3
 
--- Функція перевірки, чи повний інвентар
-local function IsBagFull()
-    for bag = 0, 4 do  -- Перевіряємо всі сумки гравця (0-4)
-        local numSlots = C_Container.GetContainerNumSlots(bag)  -- Новий API для отримання кількості слотів
-        for slot = 1, numSlots do
-            if not C_Container.GetContainerItemInfo(bag, slot) then
-                return false  -- Знайшли вільний слот
+-- Визначення функцій залежно від версії WoW
+local IsBagFull
+
+if majorVersion >= 10 then
+    -- Сучасний WoW (10.0+)
+    IsBagFull = function()
+        for bag = 0, 4 do
+            local numSlots = C_Container.GetContainerNumSlots(bag)
+            for slot = 1, numSlots do
+                if not C_Container.GetContainerItemInfo(bag, slot) then
+                    return false
+                end
             end
         end
+        return true
     end
-    return true  -- Інвентар повний
+else
+-- Старі версії WoW (до 10.0)
+    IsBagFull = function()
+        for bag = 0, 4 do
+            for slot = 1, GetContainerNumSlots(bag) do
+                if not GetContainerItemID(bag, slot) then
+                    return false
+                end
+            end
+        end
+        return true
+    end
 end
 
 -- Створюємо фрейм для обробки подій
@@ -32,13 +51,12 @@ local function OnEvent(self, event, ...)
     elseif event == 'LOOT_OPENED' or event == 'LOOT_READY' then
         if GetCVarBool("autoLootDefault") and (GetTime() - epoch) >= LOOT_DELAY then
             for i = GetNumLootItems(), 1, -1 do
-                if LootSlotHasItem(i) then  -- Перевірка наявності предмета
+                if LootSlotHasItem(i) then
                     LootSlot(i)
                 end
             end
             epoch = GetTime()
 
-            -- Якщо подія LOOT_OPENED і інвентар не повний, приховуємо фрейм луту
             if event == 'LOOT_OPENED' and not IsBagFull() then
                 LootFrame:Hide()
             end
