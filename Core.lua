@@ -6,8 +6,9 @@ local LOOT_DELAY = 0.3
 -- Функція перевірки, чи повний інвентар
 local function IsBagFull()
     for bag = 0, 4 do  -- Перевіряємо всі сумки гравця (0-4)
-        for slot = 1, GetContainerNumSlots(bag) do
-            if not GetContainerItemID(bag, slot) then
+        local numSlots = C_Container.GetContainerNumSlots(bag)  -- Новий API для отримання кількості слотів
+        for slot = 1, numSlots do
+            if not C_Container.GetContainerItemInfo(bag, slot) then
                 return false  -- Знайшли вільний слот
             end
         end
@@ -50,4 +51,3 @@ EventFrame:RegisterEvent('ADDON_LOADED')
 EventFrame:RegisterEvent('LOOT_OPENED')
 EventFrame:RegisterEvent('LOOT_READY')
 EventFrame:SetScript('OnEvent', OnEvent)
-
