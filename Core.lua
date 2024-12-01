@@ -2,8 +2,8 @@ local addonName, addonTable = ...
 
 local majorVersion = select(4, GetBuildInfo())
 
-local epoch = 0
 local LOOT_DELAY = 0.3
+local epoch = 0
 
 -- Визначення функцій залежно від версії WoW
 local IsBagFull
@@ -14,7 +14,8 @@ if majorVersion >= 10 then
         for bag = 0, 4 do
             local numSlots = C_Container.GetContainerNumSlots(bag)
             for slot = 1, numSlots do
-                if not C_Container.GetContainerItemInfo(bag, slot) then
+                local itemInfo = C_Container.GetContainerItemInfo(bag, slot)
+                if not itemInfo then
                     return false
                 end
             end
@@ -22,7 +23,7 @@ if majorVersion >= 10 then
         return true
     end
 else
--- Старі версії WoW (до 10.0)
+    -- Старі версії WoW (до 10.0)
     IsBagFull = function()
         for bag = 0, 4 do
             for slot = 1, GetContainerNumSlots(bag) do
@@ -58,7 +59,7 @@ local function OnEvent(self, event, ...)
             epoch = GetTime()
 
             if event == 'LOOT_OPENED' and not IsBagFull() then
-                LootFrame:Hide()
+                LootFrame:Hide()  -- Переконатися, що LootFrame існує
             end
         end
     end
