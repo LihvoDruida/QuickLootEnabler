@@ -50,6 +50,12 @@ local function OnEvent(self, event, ...)
             self:UnregisterEvent('ADDON_LOADED')
         end
     elseif event == 'LOOT_OPENED' or event == 'LOOT_READY' then
+        -- Перевіряємо, чи інвентар не повний
+        if not IsBagFull() then
+            LootFrame:Hide()  -- Приховуємо LootFrame
+        end
+    
+        -- Автоматичний збір луту
         if GetCVarBool("autoLootDefault") and (GetTime() - epoch) >= LOOT_DELAY then
             for i = GetNumLootItems(), 1, -1 do
                 if LootSlotHasItem(i) then
@@ -57,12 +63,8 @@ local function OnEvent(self, event, ...)
                 end
             end
             epoch = GetTime()
-
-            if event == 'LOOT_OPENED' and not IsBagFull() then
-                LootFrame:Hide()  -- Переконатися, що LootFrame існує
-            end
         end
-    end
+    end    
 end
 
 -- Реєструємо події
