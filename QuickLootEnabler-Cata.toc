@@ -1,8 +1,10 @@
-## Interface: 40400
+## Interface: 40401
 ## Title:<|cffff7d0aQuick|r> |cff69ccf0Loot Enabler|r
 ## Notes: QuickLootEnabler automatically enables the auto-loot feature upon addon loading.
 ## Version: v3.2
 ## Author: melles1991
-## X-Curse-Project-ID:
+
+## IconTexture: Interface\Icons\Inv_cape_special_ardenweald_d_02
+## X-Curse-Project-ID: 1076978
 
 Core.lua
