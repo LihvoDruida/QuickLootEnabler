@@ -1,4 +1,4 @@
-## Interface: 110007
+## Interface: 110007, 110100
 ## Title:<|cffff7d0aQuick|r> |cff69ccf0Loot Enabler|r
 ## Notes: QuickLootEnabler automatically enables the auto-loot feature upon addon loading.
 ## Version: v3.2
