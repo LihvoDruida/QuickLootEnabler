@@ -8,9 +8,15 @@ local currentLootIndex = nil
 -- Check if the player's bags are full
 if majorVersion >= 10 then
     IsBagFull = function()
-        local freeSlots = C_Container.GetContainerFreeSlots()
-        return #freeSlots == 0
+        for bag = 0, 4 do
+            local freeSlots = C_Container.GetContainerFreeSlots(bag)
+            if freeSlots and #freeSlots > 0 then
+                return false
+            end
+        end
+        return true
     end
+    
 else
     IsBagFull = function()
         for bag = 0, 4 do
@@ -60,9 +66,11 @@ local function OnEvent(self, event, ...)
             print(addonName .. " loaded.")
         end
     elseif event == "LOOT_OPENED" then
-        if IsBagFull() then
+        if not IsBagFull() then
             LootFrame:Hide()
-            print("🎒 Inventory is full! Looting skipped.")
+            return
+        else  
+            print("🎒 Inventory is full! Looting skipped.") 
             return
         end
 
