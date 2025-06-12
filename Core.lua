@@ -32,12 +32,13 @@ end
 local function LootNextItem()
     if not currentLootIndex then return end
     if currentLootIndex < 1 then
+        currentLootIndex = nil
+
         if allLooted then
             LootFrame:Hide()
         else
             print("⚠️ Some items could not be looted. Loot window will remain open.")
         end
-        currentLootIndex = nil
         return
     end
 
@@ -45,23 +46,23 @@ local function LootNextItem()
     if not locked then
         local before = GetNumLootItems()
         LootSlot(currentLootIndex)
-        local after = GetNumLootItems()
 
-        -- Якщо кількість предметів не зменшилась, значить, предмет не було зібрано
-        if after >= before then
-            allLooted = false
-        end
+        C_Timer.After(0.05, function()
+            local after = GetNumLootItems()
+            if after >= before then
+                allLooted = false
+            end
+
+            currentLootIndex = currentLootIndex - 1
+            C_Timer.After(LOOT_DELAY, LootNextItem)
+        end)
     else
         allLooted = false
-    end
-
-    currentLootIndex = currentLootIndex - 1
-    if currentLootIndex >= 1 then
+        currentLootIndex = currentLootIndex - 1
         C_Timer.After(LOOT_DELAY, LootNextItem)
-    else
-        C_Timer.After(LOOT_DELAY, LootNextItem) -- Ще раз викликаємо, щоб закрити або не закрити LootFrame
     end
 end
+
 
 local EventFrame = CreateFrame("Frame")
 
@@ -86,7 +87,7 @@ local function OnEvent(self, event, ...)
 
         if GetCVarBool("autoLootDefault") and (GetTime() - epoch) >= LOOT_DELAY then
             currentLootIndex = GetNumLootItems()
-            LootNextItem()
+            C_Timer.After(0.05, LootNextItem)
             epoch = GetTime()
         end
     end
