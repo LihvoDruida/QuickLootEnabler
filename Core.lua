@@ -29,15 +29,19 @@ else
     end
 end
 
+local lootEnded = false
+
 local function LootNextItem()
     if not currentLootIndex then return end
     if currentLootIndex < 1 then
-        currentLootIndex = nil
-
-        if allLooted then
-            LootFrame:Hide()
-        else
-            print("⚠️ Some items could not be looted. Loot window will remain open.")
+        if not lootEnded then
+            lootEnded = true
+            currentLootIndex = nil
+            if allLooted then
+                LootFrame:Hide()
+            else
+                print("⚠️ Some items could not be looted. Loot window will remain open.")
+            end
         end
         return
     end
@@ -52,7 +56,6 @@ local function LootNextItem()
             if after >= before then
                 allLooted = false
             end
-
             currentLootIndex = currentLootIndex - 1
             C_Timer.After(LOOT_DELAY, LootNextItem)
         end)
@@ -62,7 +65,6 @@ local function LootNextItem()
         C_Timer.After(LOOT_DELAY, LootNextItem)
     end
 end
-
 
 local EventFrame = CreateFrame("Frame")
 
@@ -79,6 +81,7 @@ local function OnEvent(self, event, ...)
         end
     elseif event == "LOOT_OPENED" then
         allLooted = true
+        lootEnded = false
 
         if IsBagFull() then
             print("🎒 Inventory is full! Looting skipped.")
