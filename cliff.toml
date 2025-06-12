@@ -52,7 +52,7 @@ commit_parsers = [
   { message = "^fix",      group = "⚔️ Bug Fixes" },
   { message = "^doc",      group = "📜 Documentation", skip = true },
   { message = "^perf",     group = "💨 Performance Tweaks" },
-  { message = "^refactor", group = "🛠️ Code Refinements", skip = true },
+  { message = "^refactor", group = "🛠️ Code Refinements" },
   { message = "^test",     group = "🎮 Testing & Validation" },
   { message = "^chore",    group = "🔧 Miscellaneous Tasks", skip = true },
   { message = "^ci",       group = "🛡️ CI/Build", skip = true },

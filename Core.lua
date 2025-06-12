@@ -1,11 +1,11 @@
 local addonName, addonTable = ...
 local majorVersion = select(4, GetBuildInfo())
 
-local LOOT_DELAY = 0.3 -- delay between looting actions
+local LOOT_DELAY = 0.3
 local epoch = 0
 local currentLootIndex = nil
+local allLooted = true
 
--- Check if the player's bags are full
 if majorVersion >= 10 then
     IsBagFull = function()
         for bag = 0, 4 do
@@ -16,7 +16,6 @@ if majorVersion >= 10 then
         end
         return true
     end
-    
 else
     IsBagFull = function()
         for bag = 0, 4 do
@@ -30,28 +29,40 @@ else
     end
 end
 
--- Loot items one by one with a delay
 local function LootNextItem()
     if not currentLootIndex then return end
     if currentLootIndex < 1 then
+        if allLooted then
+            LootFrame:Hide()
+        else
+            print("⚠️ Some items could not be looted. Loot window will remain open.")
+        end
         currentLootIndex = nil
         return
     end
 
-    -- Skip locked loot (e.g., need/greed or master loot)
     local _, _, locked = GetLootSlotInfo(currentLootIndex)
     if not locked then
+        local before = GetNumLootItems()
         LootSlot(currentLootIndex)
+        local after = GetNumLootItems()
+
+        -- Якщо кількість предметів не зменшилась, значить, предмет не було зібрано
+        if after >= before then
+            allLooted = false
+        end
+    else
+        allLooted = false
     end
 
     currentLootIndex = currentLootIndex - 1
-
     if currentLootIndex >= 1 then
         C_Timer.After(LOOT_DELAY, LootNextItem)
+    else
+        C_Timer.After(LOOT_DELAY, LootNextItem) -- Ще раз викликаємо, щоб закрити або не закрити LootFrame
     end
 end
 
--- Event handler
 local EventFrame = CreateFrame("Frame")
 
 local function OnEvent(self, event, ...)
@@ -66,24 +77,21 @@ local function OnEvent(self, event, ...)
             print(addonName .. " loaded.")
         end
     elseif event == "LOOT_OPENED" then
-        if not IsBagFull() then
-            LootFrame:Hide()
-            return
-        else  
-            print("🎒 Inventory is full! Looting skipped.") 
+        allLooted = true
+
+        if IsBagFull() then
+            print("🎒 Inventory is full! Looting skipped.")
             return
         end
 
         if GetCVarBool("autoLootDefault") and (GetTime() - epoch) >= LOOT_DELAY then
-            local totalItems = GetNumLootItems()
-            currentLootIndex = totalItems
+            currentLootIndex = GetNumLootItems()
             LootNextItem()
             epoch = GetTime()
         end
     end
 end
 
--- Register events
 EventFrame:RegisterEvent("ADDON_LOADED")
 EventFrame:RegisterEvent("LOOT_OPENED")
 EventFrame:SetScript("OnEvent", OnEvent)
